@@ -1,0 +1,41 @@
+# This file contains metadata for your plugin. Beginning
+# with version 1.8 this is the preferred way to supply information about a
+# plugin. The current method of embedding metadata in __init__.py will
+# be supported until version 2.0
+# git sha : $Format:%H$
+# This file should be included when you package your plugin.
+
+[general]
+name=Plugin Builder 3
+about=Create a template for a QGIS plugin
+description=Creates a QGIS plugin template for use as a starting point in plugin development
+version=3.2.1
+qgisMinimumVersion=2.99
+qgisMaximumVersion=3.99
+
+changelog=3.2.1 2019-06-28
+      * Bug fixes
+    3.1 2018-12-31
+      * Fix issue with reload on generated plugins
+    3.0.5 2018-12-31:
+      * Fix issue with reload on generated plugins
+    3.0.4 2018-12-25:
+      * Move dialog creation to run method.
+      * Move help file generation files to proper method
+      * Include missing tags file
+      * Attempt to compile resources.qrc when plugin is generated (requires pyrcc5 in path)
+      * Set deployment directory in Makefile based on user OS (pb_tool is preferred over make)
+      * Check for valid URL format for tracker and repository
+    3.0.3 2018-02-23: Redesign of UI to allow better editing prior to generation.
+
+homepage=http://g-sherman.github.io/Qgis-Plugin-Builder
+tracker=https://github.com/g-sherman/Qgis-Plugin-Builder/issues
+repository=https://github.com/g-sherman/Qgis-Plugin-Builder
+tags=development
+icon=icon.png
+
+experimental=False
+deprecated=False
+
+author=GeoApt LLC
+email=gsherman@geoapt.com
