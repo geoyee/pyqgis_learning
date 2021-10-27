@@ -2,7 +2,7 @@
 import math
 import random
 from qgis.core import *
-from view import showgeoms
+from demo.view import showgeoms
 
 
 lines = []
