@@ -2,14 +2,14 @@ from qgis.core import *
 
 
 def getgtypes():
-    return "point", "linestring", "polygon", \
-           "multipoint", "multilinestring", \
-           "multipolygon"
+    return 'point', 'linestring', 'polygon', \
+           'multipoint','multilinestring','multipolygon'
 
 
 def showgeoms(geoms, name="tmp", gtype=None):
     if gtype is None:
-        gtype = geoms[0].geometryType().lower()
+        gtype= geoms[0].constGet().geometryType() if isinstance(geoms[0], QgsGeometry) else geoms[0].geometryType()
+        gtype=gtype.lower()
     if gtype not in getgtypes():
         raise Exception("gtype should be one of :{" + \
                         ','.join(getgtypes()) + "}")
