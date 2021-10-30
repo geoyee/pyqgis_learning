@@ -8,11 +8,11 @@ def getgtypes():
 
 def showgeoms(geoms, name="tmp", gtype=None):
     if gtype is None:
-        gtype= geoms[0].constGet().geometryType() if isinstance(geoms[0], QgsGeometry) else geoms[0].geometryType()
-        gtype=gtype.lower()
+        gtype = geoms[0].constGet().geometryType() \
+                if isinstance(geoms[0], QgsGeometry) else geoms[0].geometryType()
+        gtype = gtype.lower()
     if gtype not in getgtypes():
-        raise Exception("gtype should be one of :{" + \
-                        ','.join(getgtypes()) + "}")
+        raise Exception("gtype should be one of :{" + ','.join(getgtypes()) + "}")
     vl = QgsVectorLayer(gtype, name, "memory")
     pr = vl.dataProvider()
     feats = []

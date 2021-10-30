@@ -1,3 +1,4 @@
+## console
 from qgis import *
 import numpy as np
 from demo.view import showgeoms
@@ -23,3 +24,11 @@ showgeoms([cd], "centroid")
 bpg = gbbx.buffer(10, 10)
 showgeoms([bpg], "bpg")
 showgeoms(bpg.get().exteriorRing(), "bpg_p")
+# 泰森多边形
+vd = QgsGeometry(mp.clone()).voronoiDiagram()
+vpoly = vd.constGet()
+showgeoms(vpoly, "Voronoi韦恩图")
+# 德劳内三角网
+dl = QgsGeometry(mp.clone()).delaunayTriangulation(0.1)
+mpoly = dl.constGet()
+showgeoms(mpoly, "Delaunay三角")
