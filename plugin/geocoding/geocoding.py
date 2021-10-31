@@ -205,7 +205,7 @@ class geocoding:
         places = read_text(self.dlg.edtTxt.text())
         geo_list = []
         for place in places:
-            result = geo_coding(place, ak)
+            result = geo_coding(place, ak, self.dlg.checkBox.isChecked())
             if result is not None:
                 geo_list.append(result)
         print(save_shp(self.dlg.edtShp.text(), geo_list))   
@@ -233,12 +233,14 @@ class geocoding:
             self.process()
             # 将结果加载QGIS界面
             shp_name = self.dlg.edtShp.text()
-            layerName = shp_name.split("/")[len(shp_name.split("/"))-1].replace(".shp","")
-            vlayer = QgsVectorLayer(shp_name,layerName,"ogr")
+            layerName = shp_name.split("/")[len(shp_name.split("/"))-1].replace(".shp", "")
+            vlayer = QgsVectorLayer(shp_name, layerName, "ogr")
+            vlayer.setProviderEncoding("utf-8")
             if vlayer.isValid():
                 QgsProject.instance().addMapLayer(vlayer)
             else:
                 print("图层加载失败！")
             pass
             # 在QGIS界面上打印结果
-            self.iface.messageBar().pushMessage("成功", "加载图层：" + layerName,level=Qgis.Success, duration=3)
+            self.iface.messageBar().pushMessage("成功", "加载图层：" + \
+                                                layerName,level=Qgis.Success, duration=3)

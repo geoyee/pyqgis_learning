@@ -25,12 +25,9 @@
   <property name="windowTitle">
    <string>geocoding</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
      <item>
       <layout class="QHBoxLayout" name="hlayTxt" stretch="1,2,1">
        <item>
@@ -151,7 +148,7 @@
           </size>
          </property>
          <property name="text">
-          <string>百度地图API Keys</string>
+          <string>百度地图API AK</string>
          </property>
         </widget>
        </item>
@@ -186,6 +183,33 @@
           <size>
            <width>93</width>
            <height>28</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>转为近似WGS84坐标</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
