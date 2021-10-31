@@ -25,9 +25,9 @@
   <property name="windowTitle">
    <string>geocoding</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_2">
+  <layout class="QHBoxLayout" name="hLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="vLayout">
      <item>
       <layout class="QHBoxLayout" name="hlayTxt" stretch="1,2,1">
        <item>

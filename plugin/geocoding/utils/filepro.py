@@ -48,7 +48,7 @@ def save_shp(shp_path, geocode_list):
     # 创建id字段
     oId = ogr.FieldDefn("id", ogr.OFTInteger)
     oLayer.CreateField(oId, 1)
-    # 创建address、title、level字段
+    # 创建address、level字段
     oAddress = ogr.FieldDefn("address", ogr.OFTString)
     oLayer.CreateField(oAddress, 1)
     oLevel = ogr.FieldDefn("level", ogr.OFTInteger)
