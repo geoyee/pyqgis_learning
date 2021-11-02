@@ -24,14 +24,15 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFileDialog
-
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .buildSeg_dialog import buildSegDialog
 import os.path
 # tools
-from .utils import InferWorker
+from qgis.utils import iface
+from qgis.core import QgsMapLayerType
+from .utils import *
 
 
 class buildSeg:
@@ -189,7 +190,9 @@ class buildSeg:
         filename, _ = QFileDialog.getOpenFileName(
             self.dlg, "选择参数路径", "", "*.pdparams")
         self.dlg.edtParams.setText(filename)
-        self.infer_worker.load_params(filename)
+        if self.infer_worker is not None:
+            self.infer_worker.load_params(filename)
+            print("成功加载参数")
 
 
     def run(self):
@@ -201,16 +204,25 @@ class buildSeg:
             self.first_start = False
             self.dlg = buildSegDialog()
             # 初始化
-            self.infer_worker = InferWorker(self.dlg.cmbModel.currentText().lower())
+            self.infer_worker = None
         # 添加事件
         self.dlg.btnParams.clicked.connect(self.select_params_file)
 
         # show the dialog
         self.dlg.show()
+        self.infer_worker = InferWorker(self.dlg.cmbModel.currentText().lower())
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+            layers = iface.activeLayer()  # 获取当前激活图层
+            # 若此图层为栅格图层
+            if layers.type() == QgsMapLayerType.RasterLayer:
+                img = raster2ndarray(layers)
+                mask = self.infer_worker.get_mask(img)
+                build_bound = bound2shp(get_polygon(mask), get_transform(layers))
+                showgeoms([build_bound], "build_bound")
+            else:
+                print("当前活动图层非栅格图层")

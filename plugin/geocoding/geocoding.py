@@ -243,4 +243,4 @@ class geocoding:
             pass
             # 在QGIS界面上打印结果
             self.iface.messageBar().pushMessage("成功", "加载图层：" + \
-                                                layerName,level=Qgis.Success, duration=3)
+                                                layerName, level=Qgis.Success, duration=3)

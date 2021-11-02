@@ -11,7 +11,7 @@ class InferWorker:
     def __init__(self, model: str, params_path=None, size_tuple=(256, 256)) -> None:
         self.seg_model = self.MODELS[model]
         if params_path is not None:
-            self.seg_model.load_params(params_path)
+            self.load_params(params_path)
         self.params_path = params_path
         self.size_tuple = size_tuple
         __mean=[0.5] * 3
@@ -34,14 +34,18 @@ class InferWorker:
         img = (img - self.__mean) / self.__std
         C, H, W = img.shape
         img = img.reshape([1, C, H, W])
-        return img
+        return paddle.to_tensor(img)
 
     def __tensor2result(self, pre):
-        pred = paddle.argmax(pre, axis=1).numpy().astype('uint8')
-        pred *= 255
-        return pred
+        if isinstance(pre, list):
+            pre = pre[0]
+        pred = paddle.argmax(pre, axis=1).numpy()
+        # 标注反了
+        pred -= 1
+        pred *= -255
+        return pred.astype('uint8').squeeze()
 
-    def get_shape(self, img):
+    def get_mask(self, img):
         img = self.__process(img)
         pre = self.seg_model(img)
         pred = self.__tensor2result(pre)
