@@ -43,7 +43,7 @@ class InferWorker:
         # 标注反了
         pred -= 1
         pred *= -255
-        return pred.astype('uint8').squeeze()
+        return pred.astype("uint8").squeeze()
 
     def get_mask(self, img):
         img = self.__process(img)

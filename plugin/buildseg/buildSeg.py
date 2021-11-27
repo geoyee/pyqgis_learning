@@ -31,7 +31,7 @@ from .buildSeg_dialog import buildSegDialog
 import os.path
 # tools
 from qgis.utils import iface
-from qgis.core import QgsMapLayerType
+from qgis.core import QgsMapLayerType, QgsProject
 from .utils import *
 
 
@@ -218,11 +218,13 @@ class buildSeg:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             layers = iface.activeLayer()  # 获取当前激活图层
+            proj = layers.crs()
             # 若此图层为栅格图层
             if layers.type() == QgsMapLayerType.RasterLayer:
                 img = raster2ndarray(layers)
                 mask = self.infer_worker.get_mask(img)
-                build_bound = bound2shp(get_polygon(mask), get_transform(layers))
-                showgeoms([build_bound], "build_bound")
+                build_bound = bound2shp(get_polygon(mask), 
+                                        get_transform(layers, self.infer_worker.size_tuple)) 
+                showgeoms([build_bound], "build_bound", proj=proj)
             else:
                 print("当前活动图层非栅格图层")

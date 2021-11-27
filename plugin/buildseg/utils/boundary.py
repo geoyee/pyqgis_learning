@@ -14,17 +14,23 @@ def get_polygon(label, sample="Dynamic"):
         polygons = []
         relas = []
         for idx, (contour, hierarchy) in enumerate(zip(contours, hierarchys[0])):
+            # print(hierarchy)
             # opencv实现边界简化
-            epsilon = 0.0005 * cv2.arcLength(contour, True) if sample == "Dynamic" else sample
+            epsilon = (
+                0.005 * cv2.arcLength(contour, True) if sample == "Dynamic" else sample
+            )
             if not isinstance(epsilon, float) and not isinstance(epsilon, int):
                 epsilon = 0
             # print("epsilon:", epsilon)
-            out = cv2.approxPolyDP(contour, epsilon, True)  # 自然图像简化
-            # 自定义边界简化
-            out = approx_poly_DP(out)
+            # -- Douglas-Peucker算法边界简化
+            contour = cv2.approxPolyDP(contour, epsilon / 10, True)
+            # -- 自定义（角度和距离）边界简化
+            out = approx_poly_DIY(contour)
             # 给出关系
-            rela = (idx,  # own
-                    hierarchy[-1] if hierarchy[-1] != -1 else None)  # parent
+            rela = (
+                idx,  # own
+                hierarchy[-1] if hierarchy[-1] != -1 else None,
+            )  # parent
             polygon = []
             for p in out:
                 polygon.append(p[0])
@@ -37,19 +43,11 @@ def get_polygon(label, sample="Dynamic"):
                         if polygons[i] is not None and polygons[j] is not None:
                             min_i, min_o = __find_min_point(polygons[i], polygons[j])
                             # 改变顺序
-                            s_pj = polygons[j][: min_o]
-                            polygons[j] = polygons[j][min_o:]
-                            polygons[j].extend(s_pj)
-                            s_pi = polygons[i][: min_i]
-                            polygons[i] = polygons[i][min_i:]
-                            polygons[i].extend(s_pi)
+                            polygons[i] = __change_list(polygons[i], min_i)
+                            polygons[j] = __change_list(polygons[j], min_o)
                             # 连接
-                            polygons[j].append(polygons[j][0])  # 外圈闭合
-                            polygons[j].extend(polygons[i])  # 连接内圈
-                            try:
-                                polygons[j].append(polygons[i][0])  # 内圈闭合
-                            except:
-                                pass
+                            if min_i != -1 and len(polygons[i]) > 0:
+                                polygons[j].extend(polygons[i])  # 连接内圈
                             polygons[i] = None
         polygons = list(filter(None, polygons))  # 清除加到外圈的内圈多边形
         return polygons
@@ -58,14 +56,25 @@ def get_polygon(label, sample="Dynamic"):
         return None
 
 
+def __change_list(polygons, idx):
+    if idx == -1:
+        return polygons
+    s_p = polygons[:idx]
+    polygons = polygons[idx:]
+    polygons.extend(s_p)
+    polygons.append(polygons[0])  # 闭合圈
+    return polygons
+
+
 def __find_min_point(i_list, o_list):
     min_dis = 1e7
     idx_i = -1
     idx_o = -1
     for i in range(len(i_list)):
         for o in range(len(o_list)):
-            dis = math.sqrt((i_list[i][0] - o_list[o][0]) ** 2 + \
-                            (i_list[i][1] - o_list[o][1]) ** 2)
+            dis = math.sqrt(
+                (i_list[i][0] - o_list[o][0]) ** 2 + (i_list[i][1] - o_list[o][1]) ** 2
+            )
             if dis <= min_dis:
                 min_dis = dis
                 idx_i = i
@@ -79,7 +88,9 @@ def __cal_ang(p1, p2, p3):
     a = math.sqrt((p2[0] - p3[0]) * (p2[0] - p3[0]) + (p2[1] - p3[1]) * (p2[1] - p3[1]))
     b = math.sqrt((p1[0] - p3[0]) * (p1[0] - p3[0]) + (p1[1] - p3[1]) * (p1[1] - p3[1]))
     c = math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]))
-    ang = math.degrees(math.acos((b**2 - a**2 - c**2) / (-2 * a * c + eps)))  # p2对应
+    ang = math.degrees(
+        math.acos((b ** 2 - a ** 2 - c ** 2) / (-2 * a * c + eps))
+    )  # p2对应
     return ang
 
 
@@ -89,23 +100,10 @@ def __cal_dist(p1, p2):
 
 
 # 边界点简化
-def approx_poly_DP(contour, min_dist=10, ang_err=5):
+def approx_poly_DIY(contour, min_dist=10, ang_err=5):
     # print(contour.shape)  # N, 1, 2
     cs = [contour[i][0] for i in range(contour.shape[0])]
-    ## 1. 先删除夹角接近180度的点
-    i = 0
-    while i < len(cs):
-        try:
-            last = (i - 1) if (i != 0) else (len(cs) - 1)
-            next = (i + 1) if (i != len(cs) - 1) else 0
-            ang_i = __cal_ang(cs[last], cs[i], cs[next])
-            if abs(ang_i) > (180 - ang_err):
-                del cs[i]
-            else:
-                i += 1
-        except:
-            i += 1
-    ## 2. 再删除两个相近点与前后两个点角度接近的点
+    ## 1. 先删除两个相近点与前后两个点角度接近的点
     i = 0
     while i < len(cs):
         try:
@@ -130,5 +128,19 @@ def approx_poly_DP(contour, min_dist=10, ang_err=5):
                 i += 1
         except:
             i += 1
+    ## 2. 再删除夹角接近180度的点
+    i = 0
+    while i < len(cs):
+        try:
+            last = (i - 1) if (i != 0) else (len(cs) - 1)
+            next = (i + 1) if (i != len(cs) - 1) else 0
+            ang_i = __cal_ang(cs[last], cs[i], cs[next])
+            if abs(ang_i) > (180 - ang_err):
+                del cs[i]
+            else:
+                i += 1
+        except:
+            # i += 1
+            del cs[i]
     res = np.array(cs).reshape([-1, 1, 2])
     return res
