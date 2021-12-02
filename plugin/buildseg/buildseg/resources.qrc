@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/buildSeg" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>
