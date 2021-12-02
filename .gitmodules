@@ -1,0 +1,3 @@
+[submodule "plugin/buildseg"]
+	path = plugin/buildseg
+	url = git@github.com:geoyee/buildseg.git
